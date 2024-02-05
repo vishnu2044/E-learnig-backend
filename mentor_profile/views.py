@@ -21,8 +21,6 @@ class MentorTokenObtainSerialzer(TokenObtainPairSerializer):
         token['first_name'] = user.first_name
         token['last_name'] = user.last_name
         token['email'] = user.email
-        if user.is_staff:
-            token['is_staff'] = True
 
         return token
 
@@ -49,7 +47,9 @@ def signup_mentor_profile(request):
 
 @api_view(['POST'])
 def mentor_login(request):
+
     if request.method == 'POST':
+
         username = request.data.get("username")
         password = request.data.get("password")
 
@@ -59,11 +59,9 @@ def mentor_login(request):
             mentor_login_serializer = MentorTokenObtainSerialzer(data = {'username': username, 'password': password})
             mentor_login_serializer.is_valid(raise_exception=True)
             token_data = mentor_login_serializer.validated_data
-
             return Response({
                 "access": token_data['access'],
                 'refresh': token_data['refresh'],
-                'is_staff': user.is_staff
             }, status= status.HTTP_200_OK)
         else:
             return Response({"error": "invalied credentials"}, status=status.HTTP_400_BAD_REQUEST)
