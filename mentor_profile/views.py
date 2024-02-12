@@ -65,3 +65,7 @@ def mentor_login(request):
             }, status= status.HTTP_200_OK)
         else:
             return Response({"error": "invalied credentials"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+def get_mentor_profile(request):
+    pass
