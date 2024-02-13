@@ -25,5 +25,6 @@ urlpatterns = [
     path('department/', include('departments.urls')),
     path('admin-profile/', include('admin_profile.urls')),
     path('mentor-profile/', include('mentor_profile.urls')),
+    path('admin-management/', include('admin_management.urls')),
 
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,8 @@ class Professions(models.Model):
     profession = models.CharField(max_length = 255, null=True, blank=True)
 
 class EducationOptions(models.Model):
-    pass
+    id = models.AutoField(primary_key=True)
+    education = models.CharField(max_length = 255, null=True, blank=True)
+    
 
 
