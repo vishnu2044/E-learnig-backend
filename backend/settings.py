@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'admin_profile.apps.AdminProfileConfig',
     'mentor_profile.apps.MentorProfileConfig',
     'admin_management.apps.AdminManagementConfig',
+    'user_profile.apps.UserProfileConfig',
 
     'rest_framework',
     

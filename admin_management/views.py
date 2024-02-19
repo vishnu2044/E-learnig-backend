@@ -33,23 +33,23 @@ def add_education(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_education_option_list(reqeust):
+def get_education_option_list(request):
     try:
         profession_list = EducationOptions.objects.all()
         serializer = EducationSerialzier(profession_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Professions.DoesNotExist:
-        return Response({"error" : "empty"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error" : "Educational details are empty"}, status=status.HTTP_404_NOT_FOUND)
 
 
 
 #Porfession management >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 @api_view(["POST"])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def add_profession(request):
     if request.method == "POST":
         try:
-            profession = request.data.get("education")
+            profession = request.data.get("profession")
             check = Professions.objects.filter(profession = profession)
             if check:
                 return Response({'error': 'already presenet'}, status=status.HTTP_409_CONFLICT)
@@ -68,13 +68,30 @@ def add_profession(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_profession_option_list(reqeust):
+def get_profession_option_list(request):
     try:
-        profession_list = EducationOptions.objects.all()
+        profession_list = Professions.objects.all()
         serializer = ProfessionSerializer(profession_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except EducationOptions.DoesNotExist:
-        return Response({"error" : "notes is empty"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error" : "professional detailss are empty"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_profession(request, profession_id):
+    try:
+        Professions.objects.get(id = profession_id).delete()
+        return Response({"success": "data deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    except Professions.DoesNotExist:
+        return Response({'error': 'data does not excists' }, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_education(request, edu_id):
+    try:
+        EducationOptions.objects.get(id = edu_id).delete()
+        return Response({'success': 'data deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
+    except EducationOptions.DoesNotExist:
+        return Response({'error': 'data does not excists' }, status=status.HTTP_404_NOT_FOUND)
