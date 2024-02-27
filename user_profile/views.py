@@ -6,11 +6,8 @@ from .serializer import UserImagesSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ParseError
-import base64
 from django.contrib.auth.models import User
-from django.http import HttpResponse
 import uuid
-from django.http import FileResponse
 from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
@@ -20,40 +17,21 @@ from django.core.exceptions import ObjectDoesNotExist
 def upload_profile_image(request):
     if request.method == "POST":
         user = request.user
-        print("user:::::::::::", user.username)
         profile_img = request.FILES.get("profile_img") 
-        
         if profile_img:
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(len(profile_img))
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(">>>>>>>>>>>>>>>>>>>")
-            # Generate a unique filename
-            unique_filename = f"profile_image_{uuid.uuid4().hex}.jpg"
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(len(unique_filename))
-            print(">>>>>>>>>>>>>>>>>>>")
-            print(">>>>>>>>>>>>>>>>>>>")
-            print("image unique name:::::::::", unique_filename)
+            unique_filename = f"profile_image_{user.username}_{user.id}.jpg"
             try:
                 data = UserProfileImages.objects.get(user=user)
             except UserProfileImages.DoesNotExist:
                 data = UserProfileImages.objects.create(user=user)
-
             # Assign the unique filename to the image
             data.profile_image.save(unique_filename, profile_img)
             data.save()
             return Response({"success": "Profile updated successfully"}, status=status.HTTP_200_OK)
         else:
-            print("image is not found!!!!")
-            print("image is not found!!!!")
-            print("image is not found!!!!")
-            print("image is not found!!!!")
             raise ParseError("Image not found")
     else:
-        return Response({"error": "User not authorized"})
+        return Response({"error": "Method not allowed"})
 
 
 
@@ -70,3 +48,36 @@ def get_profile_img(request, user_id):
         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_cover_image(reqeust):
+    if reqeust.method == "POST":
+        user = reqeust.user
+        cover_img = reqeust.FILES.get("cover_img")
+        if cover_img:
+            unique_file_name = f"cover_img_{user.username}_{user.id}.jpg"
+            try:
+                data = UserProfileImages.objects.get(user = user)
+            except UserProfileImages.DoesNotExist:
+                data = UserProfileImages.objects.create(user = user)
+            data.cover_image.save(unique_file_name, cover_img)
+            data.save()
+            return Response({"success": "Cover image saved successfully"}, status=status.HTTP_200_OK)
+        else:
+            raise ParseError("image not found")
+    else:
+        return Response({"error": "Method not allowed"}, status=status.HTTP_502_BAD_GATEWAY)
+    
+    
+@api_view(["GET"]) 
+@permission_classes([IsAuthenticated])
+def get_cover_img(reqeust, user_id):
+    try:
+        data = UserProfileImages.objects.get(user = user_id)
+        if data:
+            serializer = UserImagesSerializer(data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    except ObjectDoesNotExist:
+        return Response({'error': 'Cover image not found'}, status=status.HTTP_404_NOT_FOUND)
