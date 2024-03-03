@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import SignupMentorSerializer
@@ -11,17 +12,18 @@ from django.contrib.auth import authenticate
 
 
 
+
 # Create your views here.
 class MentorTokenObtainSerialzer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         token['username'] = user.username
         token['id'] = user.id
         token['first_name'] = user.first_name
         token['last_name'] = user.last_name
         token['email'] = user.email
+        
 
         return token
 
@@ -69,5 +71,24 @@ def mentor_login(request):
 
         
 
+
 def get_mentor_profile(request):
     pass
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def edit_mentor_profile(request, user_id):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        education = request.POST.get("education")
+        profession = request.POST.get("profession")
+        email = request.POST.get("email")
+        firstname = request.POST.get("firstname")
+        lastname = request.POST.get("lastname")
+        skills = request.POST.get("skills")
+        print("skils :::::::::::::::", skills)
+
+
+        return Response({"success": "data get"}, status= status.HTTP_200_OK)
+    else:
+        return Response({"error": "method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
