@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'mentor_profile.apps.MentorProfileConfig',
     'admin_management.apps.AdminManagementConfig',
     'user_profile.apps.UserProfileConfig',
+    'external_apis.apps.ExternalApisConfig',
 
     'rest_framework',
     
@@ -203,7 +204,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  
-# ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+    "http://maps.googleapis.com"
+
+]
 

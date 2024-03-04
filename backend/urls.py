@@ -27,6 +27,7 @@ urlpatterns = [
     path('mentor-profile/', include('mentor_profile.urls')),
     path('admin-management/', include('admin_management.urls')),
     path('user-profile/', include('user_profile.urls')),
+    path("apis/", include("external_apis.urls"))
 
 
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
