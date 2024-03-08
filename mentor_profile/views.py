@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import SignupMentorSerializer
+from .serializers import SignupMentorSerializer, MenterUserSerializer, MentorProfileSerializer
+from .models import MentorProfile, Skills
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -71,9 +72,27 @@ def mentor_login(request):
 
         
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_mentor_profile(request, user_id):
+    print("its working")
+    user = User.objects.get(id = user_id)
+    user_serialzer = MenterUserSerializer(user)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print("user serializer :::::::", user_serialzer)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    try:
+        mentor_profile = MentorProfile.objects.get(user = user)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("user serializer :::::::", user_serialzer)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    except:
+        print("mentor profile not created")
+    
+    return Response(user_serialzer.data, status=status.HTTP_200_OK)
 
-def get_mentor_profile(request):
-    pass
+    
+    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -85,10 +104,37 @@ def edit_mentor_profile(request, user_id):
         email = request.POST.get("email")
         firstname = request.POST.get("firstname")
         lastname = request.POST.get("lastname")
-        skills = request.POST.get("skills")
-        print("skils :::::::::::::::", skills)
+        place = request.POST.get("place")
+        contactNumber = request.POST.get("contactNumber")
+        industrialExperience = request.POST.get("industrialExperience")
+        teachingExperience = request.POST.get("teachingExperience")
+        selfIntro = request.POST.get("selfIntro")
 
+        user = User.objects.get(id = user_id)
+        try:
+            mentor_profile = MentorProfile.objects.get(user = user)
 
+        except MentorProfile.DoesNotExist:
+            mentor_profile = MentorProfile.objects.create(user = user)
+        mentor_profile.user = user
+        mentor_profile.contact_number = contactNumber
+        mentor_profile.education = education
+        mentor_profile.profession = profession
+        mentor_profile.place = place
+        mentor_profile.industrialExperience = industrialExperience
+        mentor_profile.teachingExperience =teachingExperience
+        mentor_profile.selfIntro = selfIntro
+
+        mentor_profile.save()
+        try:
+            user = User.objects.get(id = user_id)
+            # user.username = username,
+            user.first_name = firstname,
+            user.last_name = lastname,
+            user.email = email
+            user.save()
+        except User.DoesNotExist:
+            return Response({"error": "authentication error"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({"success": "data get"}, status= status.HTTP_200_OK)
     else:
         return Response({"error": "method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -7,5 +7,6 @@ urlpatterns = [
     path('mentor-login/', views.mentor_login, name='mentor-login'),
 
     path('edit-mentor-profile/<int:user_id>/', views.edit_mentor_profile, name='edit-mentor-profile'),
+    path('get-mentor-profile/<int:user_id>/', views.get_mentor_profile, name='get-mentor-profile'),
 ]
     
