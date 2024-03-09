@@ -75,21 +75,19 @@ def mentor_login(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_mentor_profile(request, user_id):
-    print("its working")
-    user = User.objects.get(id = user_id)
-    user_serialzer = MenterUserSerializer(user)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    print("user serializer :::::::", user_serialzer)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     try:
-        mentor_profile = MentorProfile.objects.get(user = user)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("user serializer :::::::", user_serialzer)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    except:
-        print("mentor profile not created")
-    
-    return Response(user_serialzer.data, status=status.HTTP_200_OK)
+        user = User.objects.get(id=user_id)
+        try:
+            mentor_profile = MentorProfile.objects.get(user=user)
+            mentor_profile_serializer = MentorProfileSerializer(mentor_profile)
+            return Response(mentor_profile_serializer.data, status=status.HTTP_200_OK)
+        
+        except MentorProfile.DoesNotExist:
+            return Response({"error":"Mentor profile is not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
     
     
@@ -110,6 +108,14 @@ def edit_mentor_profile(request, user_id):
         teachingExperience = request.POST.get("teachingExperience")
         selfIntro = request.POST.get("selfIntro")
 
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("data:::::: education", education)
+        print("first name:::::::::", firstname)
+        print("first name:::::::::", lastname)
+        print("first email :::::::::", email)
+
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ")
+
         user = User.objects.get(id = user_id)
         try:
             mentor_profile = MentorProfile.objects.get(user = user)
@@ -129,10 +135,11 @@ def edit_mentor_profile(request, user_id):
         try:
             user = User.objects.get(id = user_id)
             # user.username = username,
-            user.first_name = firstname,
-            user.last_name = lastname,
+            user.first_name = firstname
+            user.last_name = lastname
             user.email = email
             user.save()
+            print("user details updated")
         except User.DoesNotExist:
             return Response({"error": "authentication error"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({"success": "data get"}, status= status.HTTP_200_OK)
