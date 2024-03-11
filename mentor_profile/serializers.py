@@ -22,3 +22,10 @@ class MentorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MentorProfile
         fields = '__all__'
+
+
+class MentorSkillsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Skills
+        fields = "__all__"

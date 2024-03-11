@@ -8,5 +8,10 @@ urlpatterns = [
 
     path('edit-mentor-profile/<int:user_id>/', views.edit_mentor_profile, name='edit-mentor-profile'),
     path('get-mentor-profile/<int:user_id>/', views.get_mentor_profile, name='get-mentor-profile'),
+
+    path('update-skills/<int:user_id>/', views.update_skills, name='update-skills'),
+    path('get-mentor-skills/<int:user_id>/', views.get_mentor_skills, name='get-mentor-skills'),
+
+
 ]
     

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import SignupMentorSerializer, MenterUserSerializer, MentorProfileSerializer
+from .serializers import SignupMentorSerializer, MenterUserSerializer, MentorProfileSerializer, MentorSkillsSerializer
 from .models import MentorProfile, Skills
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -108,14 +108,6 @@ def edit_mentor_profile(request, user_id):
         teachingExperience = request.POST.get("teachingExperience")
         selfIntro = request.POST.get("selfIntro")
 
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("data:::::: education", education)
-        print("first name:::::::::", firstname)
-        print("first name:::::::::", lastname)
-        print("first email :::::::::", email)
-
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ")
-
         user = User.objects.get(id = user_id)
         try:
             mentor_profile = MentorProfile.objects.get(user = user)
@@ -145,3 +137,44 @@ def edit_mentor_profile(request, user_id):
         return Response({"success": "data get"}, status= status.HTTP_200_OK)
     else:
         return Response({"error": "method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_skills(request, user_id):
+    if request.method == "POST":
+        user = User.objects.get(id = user_id)
+        skills = request.POST.get("skills")
+        try:
+            skillsdb = Skills.objects.get(user = user)
+            skillsdb.skills += skills
+            skillsdb.save()
+        except Skills.DoesNotExist:
+            skillsdb = Skills.objects.create(user = user,
+                                            skills = skills
+                                            )
+        return Response({"success": "skills added successfully"}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({"error": "method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mentor_skills(request, user_id):
+    try:
+        try:
+            user = User.objects.get(id = user_id)
+        except User.DoesNotExist:
+            return Response({"error": "user doesnt excits"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        skills = Skills.objects.get(user = user)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(skills.skills)
+        data = {}
+        data["skills"] = skills.skills.split(',')
+        print(data)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        return Response(data, status=status.HTTP_200_OK)
+    except Skills.DoesNotExist:
+        return Response({'error': "data not found"}, status=status.HTTP_404_NOT_FOUND)
