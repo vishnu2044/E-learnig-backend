@@ -144,14 +144,20 @@ def update_skills(request, user_id):
     if request.method == "POST":
         user = User.objects.get(id = user_id)
         skills = request.POST.get("skills")
-        try:
-            skillsdb = Skills.objects.get(user = user)
-            skillsdb.skills += skills
-            skillsdb.save()
-        except Skills.DoesNotExist:
-            skillsdb = Skills.objects.create(user = user,
-                                            skills = skills
-                                            )
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("skills", skills)
+        skills_list = skills.split(',')
+        print("skills list::::::", skills_list)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        
+        
+        for skill in skills_list:
+            print("skills", skill)
+            if not Skills.objects.filter(user = user, skills = skill).exists() :
+                skillsdb = Skills.objects.create(user=user, skills=skill)
+
         return Response({"success": "skills added successfully"}, status=status.HTTP_200_OK)
     
     else:
@@ -166,15 +172,14 @@ def get_mentor_skills(request, user_id):
         except User.DoesNotExist:
             return Response({"error": "user doesnt excits"}, status=status.HTTP_401_UNAUTHORIZED)
         
-        skills = Skills.objects.get(user = user)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(skills.skills)
-        data = {}
-        data["skills"] = skills.skills.split(',')
-        print(data)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        return Response(data, status=status.HTTP_200_OK)
+        skills = Skills.objects.filter(user = user)
+        skills_serializer = MentorSkillsSerializer(skills, many=True)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(skills_serializer.data)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+        return Response(skills_serializer.data, status=status.HTTP_200_OK)
     except Skills.DoesNotExist:
         return Response({'error': "data not found"}, status=status.HTTP_404_NOT_FOUND)

@@ -28,4 +28,4 @@ class MentorSkillsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Skills
-        fields = "__all__"
+        fields = ["skills", "id"]

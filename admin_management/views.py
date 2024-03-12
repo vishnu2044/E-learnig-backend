@@ -37,6 +37,9 @@ def get_education_option_list(request):
     try:
         profession_list = EducationOptions.objects.all()
         serializer = EducationSerialzier(profession_list, many=True)
+        print(">>>>>>>>>>>>>>>>>>>>>")
+        print(serializer.data)
+        print(">>>>>>>>>>>>>>>>>>>>>")
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Professions.DoesNotExist:
         return Response({"error" : "Educational details are empty"}, status=status.HTTP_404_NOT_FOUND)
