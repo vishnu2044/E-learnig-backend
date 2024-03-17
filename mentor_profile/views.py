@@ -171,15 +171,33 @@ def get_mentor_skills(request, user_id):
             user = User.objects.get(id = user_id)
         except User.DoesNotExist:
             return Response({"error": "user doesnt excits"}, status=status.HTTP_401_UNAUTHORIZED)
-        
         skills = Skills.objects.filter(user = user)
         skills_serializer = MentorSkillsSerializer(skills, many=True)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(skills_serializer.data)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
         return Response(skills_serializer.data, status=status.HTTP_200_OK)
     except Skills.DoesNotExist:
         return Response({'error': "data not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_skills(request, user_id):
+    print("its working::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+    try:
+        user = User.objects.get(id = user_id)
+        removed_skills = request.POST.get("removedSkills")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(removed_skills)
+        skill_list = removed_skills.split(",")
+        print(skill_list)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+        try:
+            for i in skill_list:
+                skills = Skills.objects.filter(user = user, skills = i)
+                skills.delete()
+            return Response({'success': "data deleted successfully"}, status=status.HTTP_200_OK)
+        except Skills.DoesNotExist:
+            return Response({"error": "skills data base not found"}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        return Response({"error": "user doesnt excits"}, status=status.HTTP_401_UNAUTHORIZED)

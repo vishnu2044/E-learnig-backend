@@ -11,6 +11,8 @@ urlpatterns = [
 
     path('update-skills/<int:user_id>/', views.update_skills, name='update-skills'),
     path('get-mentor-skills/<int:user_id>/', views.get_mentor_skills, name='get-mentor-skills'),
+    path('remove-skills/<int:user_id>/', views.remove_skills, name='remove-skills'),
+
 
 
 ]
